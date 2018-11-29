@@ -14,7 +14,7 @@ library(tidyverse)
 # Set the working directory to import the metadata
 setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/Test data")
 # Import the recoded metadata
-meta_data <- read.csv("recoded_metadata.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?")) 
+meta_data <- read.csv("recoded_metadata 18.09.2018.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?")) 
 # Remove the first colomn of numbers that are added when importing .csv files.
 meta_data <- meta_data[c(2:ncol(meta_data))]
 
@@ -41,9 +41,9 @@ prop_all_metadata_merged <- merge(meta_data,
 
 # Select data
 seqs_subsampled_all <- dplyr::select(filter(prop_all_metadata_merged,
-                                            sample_age %in% c(1)),
-                                     c(Lane_ID,
-                                       Acinetobacter:ncol(prop_all_metadata_merged)))
+                                            sample_age %in% c(1)), # Select only rows from Time point 1
+                                     c(Lane_ID, # Selet the Lane_ID column
+                                       Acinetobacter:ncol(prop_all_metadata_merged))) # Select all sequence columns
 
 ##Selct the Lane_ID column from the sequence data file into its own data frame
 Lane_ID <- subset(seqs_subsampled_all, select=c(Lane_ID))
@@ -96,17 +96,18 @@ prop_metadata_merged <- merge(meta_data, seqs_subsampled_10, by="Lane_ID")
 
 # Select the sequence data to use
 seqs_subsampled_10 <- dplyr::select(filter(prop_metadata_merged,
-                                        sample_age %in% c(1)),
-                                 c(sample_ID, 33:ncol(prop_metadata_merged)))
+                                        sample_age %in% c(1)), # Select only rows from Time point 1
+                                 c(sample_ID, 33:ncol(prop_metadata_merged))) # Select all sequence columns
+
 # Make the sample_ID column into rownames
 seqs_subsampled_10 <- column_to_rownames(seqs_subsampled_10, var = "sample_ID")
-
 seqs_subsampled_10 <- seqs_subsampled_10[, 1:ncol(seqs_subsampled_10)]*100
 
 # Select the metadata to use
 meta_subsampled <- dplyr::select(filter(prop_metadata_merged,
-                                        sample_age %in% c(1)),
-                                 c(sample_ID, Treatment))
+                                        sample_age %in% c(1)), #Select only rows from Time point 1
+                                 c(sample_ID, Treatment)) # Select the sample_ID and Treatment columns
+
 # Make the sample_ID column into rownames
 meta_subsampled <- column_to_rownames(meta_subsampled, var = "sample_ID")
 
@@ -143,46 +144,47 @@ colour_palette <- colorRampPalette(colors=c("white",
                                             "black"))(100)
 
 # Create the coloured side bar group annotation for the heatmap
-sidebar_annotation <- rowAnnotation(df = annot_df,
-                                    col = col,
-                                    annotation_width = unit(c(.25), "cm"),
-                                    annotation_legend_param = list(title = "Group",
-                                                                   title_gp = gpar(fontsize = 7),
-                                                                   labels_gp = gpar(fontsize = 7)))
+sidebar_annotation <- rowAnnotation(df = annot_df, # Dataframe containing treatment groups
+                                    col = col, # The list of treatment groups and their assigned colours
+                                    annotation_width = unit(c(.25), "cm"), # Set the width of the side bar
+                                    annotation_legend_param = list(title = "Group", # Sidebar legend title
+                                    title_gp = gpar(fontsize = 7), # Sidebar legend title font size
+                                    labels_gp = gpar(fontsize = 7))) # Sidebar legend label font size
 
 # Create the Bifidobacteria barplot annotation for the heatmap
-barplot_annotation <- rowAnnotation("Bifidobacterium (%)" = anno_barplot(as.matrix(Bifidobacteria),
-                                                                         which = "row",
-                                                                         axis = TRUE,
-                                                                         bar_width = 0.05,
-                                                                         title_gp = gpar(fontsize = 7),
-                                                                         axis_gp = gpar(fontsize = 7)),
-                                    show_annotation_name = TRUE,
-                                    annotation_name_gp = gpar(fontsize = 7, fontface = "italic"),
-                                    annotation_name_rot = c(0),
-                                    annotation_name_offset = unit(10, "mm"),
-                                    annotation_width = unit(c(1.25), "cm"))
+barplot_annotation <- rowAnnotation("Bifidobacterium (%)" = anno_barplot(as.matrix(Bifidobacteria), # Make the Bif dataframe into a matrix
+                                    which = "row", # Use rows in the matrix to make the plot
+                                    axis = TRUE, # Turns on axis lables
+                                    bar_width = 0.05, # Width of each bar in barplot
+                                    title_gp = gpar(fontsize = 7), # Axis title font size
+                                    axis_gp = gpar(fontsize = 7)), # Axis labels font size
+                                    show_annotation_name = TRUE, # Turns on axis name
+                                    annotation_name_gp = gpar(fontsize = 7, # Axis title font size
+                                                              fontface = "italic"), # Axis title in italics
+                                    annotation_name_rot = c(0), # Rotation of axis title
+                                    annotation_name_offset = unit(10, "mm"), # Axis title distance from barplot
+                                    annotation_width = unit(c(1.25), "cm")) # Width of the barplot
 
 # Create the heatmap
-heatmap <- Heatmap(seqs_subsampled_10,
-                   name = "Proportion",
-                   col = colour_palette,
-                   cluster_rows = row_clustering,
-                   cluster_columns = col_clustering,
-                   show_row_names = FALSE,
-                   row_names_gp = gpar(fontsize = 2),
-                   column_names_gp = gpar(fontsize = 7,
-                                          fontface = "italic"),
-                   column_title_gp = gpar(fontsize = 7),
-                   row_title = "Infant samples",
-                   row_title_gp = gpar(fontsize = 7),
-                   column_title = "Genus",
-                   column_title_side = "bottom",
-                   heatmap_legend_param = list(title = "Proportional\nabundance (%)",
-                                               at = c(0,20,40,60,80,100),
-                                               labels = c("0","20","40","60","80","100"),
-                                               title_gp = gpar(fontsize = 7),
-                                               labels_gp = gpar(fontsize = 7)))
+heatmap <- Heatmap(seqs_subsampled_10, # The dataframe containing the heatmap data
+                   name = "Proportion", # Name is used as the title of the heatmap legend if shown
+                   col = colour_palette, # The predefined colour palette
+                   cluster_rows = row_clustering, # Cluster the rows using the predefined clustering
+                   cluster_columns = col_clustering, # Cluster the columns using the predefined clustering
+                   show_row_names = FALSE, # Show or hide the row names, TRUE to show rownames
+                   row_names_gp = gpar(fontsize = 2), # Row name font size
+                   column_names_gp = gpar(fontsize = 7, # Column name font size
+                                          fontface = "italic"), # Column names in italics
+                   column_title_gp = gpar(fontsize = 7), # Column title font size
+                   row_title = "Infant samples", # Set row title
+                   row_title_gp = gpar(fontsize = 7), # Set row title font size
+                   column_title = "Genus", # Set column title
+                   column_title_side = "bottom", # Set column title font size
+                   heatmap_legend_param = list(title = "Proportional\nabundance (%)", # Set legend title
+                                               at = c(0,20,40,60,80,100), # Set legend scale breaks
+                                               labels = c("0","20","40","60","80","100"), # Set legend scale labels
+                                               title_gp = gpar(fontsize = 7), # Set legend title font size
+                                               labels_gp = gpar(fontsize = 7))) # Set legend label font size
 
 # Combine the heatmap and the annotation together in the order in which they are to appear
 p <- heatmap + sidebar_annotation + barplot_annotation
@@ -195,4 +197,5 @@ pdf("ComplexHeatmap time point one 29.11.2018.pdf", width = 3.7, height = 6)
 # pring(p) saves the figure into a file
 print(p)
 dev.off()
+
 
