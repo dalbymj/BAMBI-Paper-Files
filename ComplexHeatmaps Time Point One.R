@@ -1,15 +1,15 @@
 
-#source('http://bioconductor.org/biocLite.R')
-#biocLite('tidyverse')
-#biocLite('stringi')
-#biocLite('survival')
-#biocLite('phyloseq')
-#biocLite("cluster")
-#biocLite("ComplexHeatmap")
-#biocLite('dplyr')
+# source('http://bioconductor.org/biocLite.R')
+# biocLite("tidyverse")
+# biocLite("stringi")
+# biocLite("survival")
+# biocLite("phyloseq")
+# biocLite("cluster")
+# biocLite("ComplexHeatmap")
+# biocLite("dplyr")
 
-#install.packages("ggplot2", dependencies=TRUE, repos="http://cran.rstudio.com/")
-#install.packages("vegan", dependencies=TRUE, repos="http://cran.rstudio.com/")
+# install.packages("ggplot2")
+# install.packages("vegan")
 
 library(stringi)
 library(survival)
@@ -17,8 +17,8 @@ library(phyloseq)
 library(cluster)
 library(ComplexHeatmap)
 library(dplyr)
-library("ggplot2")
-library("vegan")
+library(ggplot2)
+library(vegan)
 library(circlize)
 library(tidyverse)
 
@@ -28,33 +28,33 @@ library(tidyverse)
 ###################################################################
 # First merge, select, and filter the data into the correct format.
 
-##Set the working directory to import this file.
+# Set the working directory to import this file.
 setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/Test data")
-##Import the recoded metadata.
+# Import the recoded metadata.
 meta_data <- read.csv("recoded_metadata.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?")) 
-##Remove the first colomn of numbers that are added when importing .csv files.
+# Remove the first colomn of numbers that are added when importing .csv files.
 meta_data <- meta_data[c(2:ncol(meta_data))]
 
 # Reanme the Treament factors Control and Probiotic as "Control" and "Bif/Lacto".
 levels(meta_data$Treatment) <- c("Control", "Bif/Lacto")
 
-##Set the working directory to import this file.
+# Set the working directory to import this file.
 setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/All Plate Files")
-##Import the normalised sequence data.
+# Import the normalised sequence data.
 seq_data <- read.csv("mergedplates_transposed_subsampled.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?"))
-##Remove the first two colomns from this file.
+# Remove the first two colomns from this file.
 seq_data1 <- seq_data[c(3:ncol(seq_data))]
-##Convert the data in the file into proportions based on the calculated row totals.
+# Convert the data in the file into proportions based on the calculated row totals.
 seq_data.prop <- seq_data1/rowSums(seq_data1)
 
-##Selct the Lane_ID column from the sequence data file into its own data frame.
+# Selct the Lane_ID column from the sequence data file into its own data frame.
 lane_id <- subset(seq_data, select=c(Lane_ID))
-##Combine the Land_ID column with the data frame containing the sequence data as proportions.
+# Combine the Land_ID column with the data frame containing the sequence data as proportions.
 lane_id_seq_data.prop <- cbind(lane_id, seq_data.prop)
-##Merge the sequence and metadata together useing the shared Lane_ID colulmn.
+# Merge the sequence and metadata together useing the shared Lane_ID colulmn.
 prop_all_metadata_merged <- merge(meta_data, lane_id_seq_data.prop, by="Lane_ID")
 
-##Select data
+# Select data
 seqs_subsampled_all <- dplyr::select(filter(prop_all_metadata_merged,
                                             sample_age %in% c(1)),
                                      c(Lane_ID, Acinetobacter:ncol(prop_all_metadata_merged)))
