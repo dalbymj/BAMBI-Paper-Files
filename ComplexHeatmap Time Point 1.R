@@ -14,7 +14,7 @@ library(tidyverse)
 # Set the working directory to import the metadata
 setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/Test data")
 # Import the recoded metadata
-meta_data <- read.csv("recoded_metadata 18.09.2018.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?")) 
+meta_data <- read.csv("recoded_metadata 01.12.2018.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?")) 
 # Remove the first colomn of numbers that are added when importing .csv files.
 meta_data <- meta_data[c(2:ncol(meta_data))]
 
@@ -97,7 +97,7 @@ prop_metadata_merged <- merge(meta_data, seqs_subsampled_10, by="Lane_ID")
 # Select the sequence data to use
 seqs_subsampled_10 <- dplyr::select(filter(prop_metadata_merged,
                                         sample_age %in% c(1)), # Select only rows from Time point 1
-                                 c(sample_ID, 33:ncol(prop_metadata_merged))) # Select all sequence columns
+                                 c(sample_ID, 36:ncol(prop_metadata_merged))) # Select all sequence columns
 
 # Make the sample_ID column into rownames
 seqs_subsampled_10 <- column_to_rownames(seqs_subsampled_10, var = "sample_ID")
