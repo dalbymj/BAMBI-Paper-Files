@@ -7,7 +7,7 @@ library(dplyr)
 # install.packages("tidyverse")
 library(tidyverse)
 
-# Heatmap for time point 1
+# Heatmap for time point 2 (samples from 10-29 days of age).
 
 # First merge, select, and filter the data into the correct format.
 
