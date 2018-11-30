@@ -41,7 +41,7 @@ prop_all_metadata_merged <- merge(meta_data,
 
 # Select data
 seqs_subsampled_all <- dplyr::select(filter(prop_all_metadata_merged,
-                                            sample_age %in% c(3)), # Select only rows from Time point 2
+                                            sample_age %in% c(3)), # Select only rows from Time point 3
                                      c(Lane_ID, # Selet the Lane_ID column
                                        Acinetobacter:ncol(prop_all_metadata_merged))) # Select all sequence columns
 
@@ -96,7 +96,7 @@ prop_metadata_merged <- merge(meta_data, seqs_subsampled_10, by="Lane_ID")
 
 # Select the sequence data to use
 seqs_subsampled_10 <- dplyr::select(filter(prop_metadata_merged,
-                                        sample_age %in% c(3)), # Select only rows from Time point 2
+                                        sample_age %in% c(3)), # Select only rows from Time point 3
                                  c(sample_ID, 36:ncol(prop_metadata_merged))) # Select all sequence columns
 
 # Make the sample_ID column into rownames
@@ -105,7 +105,7 @@ seqs_subsampled_10 <- seqs_subsampled_10[, 1:ncol(seqs_subsampled_10)]*100
 
 # Select the metadata to use
 meta_subsampled <- dplyr::select(filter(prop_metadata_merged,
-                                        sample_age %in% c(3)), #Select only rows from Time point 2
+                                        sample_age %in% c(3)), #Select only rows from Time point 3
                                  c(sample_ID, Treatment)) # Select the sample_ID and Treatment columns
 
 # Make the sample_ID column into rownames
