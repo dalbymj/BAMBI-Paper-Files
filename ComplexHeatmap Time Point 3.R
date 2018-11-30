@@ -21,7 +21,7 @@ meta_data <- meta_data[c(2:ncol(meta_data))]
 # Reanme the Treament factors Control and Probiotic as "Control" and "Bif/Lacto".
 levels(meta_data$Treatment) <- c("Control", "Bif/Lacto")
 
-# Set the working directory to import this file.
+# Set the working directory to import the sequence data file.
 setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/All Plate Files")
 # Import the normalised sequence data.
 seq_data <- read.csv("mergedplates_transposed_subsampled.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?"))
