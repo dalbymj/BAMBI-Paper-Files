@@ -85,7 +85,6 @@ genusPalette <- c( Acinetobacter="#CDCD00",
 
 # Select data
 seqs_subsampled <- dplyr::select(filter(prop_metadata_merged,
-                                        #suspected_NEC == "y",
                                         Treatment == "Bif/Lacto",
                                         #Treatment == "Control",
                                         sample_age %in% c(1,2,3,4)),
