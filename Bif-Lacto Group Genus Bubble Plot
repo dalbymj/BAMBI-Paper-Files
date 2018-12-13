@@ -1,0 +1,192 @@
+#install.packages("ggplot2")
+library("ggplot2")
+
+# Bubble plot for Bif/Lacto group samples.
+
+# Set the working directory to import the metadata.
+setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/Test data")
+# Import the recoded metadata.
+meta_data <- read.csv("recoded_metadata 13.08.2018.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?")) 
+# Remove the first colomn of numbers that are added when importing .csv files.
+meta_data <- meta_data[c(2:ncol(meta_data))]
+
+# Reanme the Treament factors Control and Probiotic as "Control" and "Bif/Lacto".
+levels(meta_data$Treatment) <- c("Control", "Bif/Lacto")
+
+# Set the working directory to import the sequence data file.
+setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/All Plate Files")
+# Import the normalised sequence data.
+seq_data <- read.csv("mergedplates_transposed_subsampled.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?"))
+# Remove the first two colomns from this file.
+seq_data1 <- seq_data[c(3:ncol(seq_data))]
+# Convert the data in the file into proportions based on the calculated row totals.
+seq_data.prop <- seq_data1/rowSums(seq_data1)*100
+
+# Selct the Lane_ID column from the sequence data file into its own data frame.
+lane_id <- subset(seq_data, select=c(Lane_ID))
+# Combine the Land_ID column with the data frame containing the sequence data as proportions.
+lane_id_seq_data.prop <- cbind(lane_id, seq_data.prop)
+# Merge the sequence and metadata together useing the shared Lane_ID colulmn.
+prop_metadata_merged <- merge(meta_data, lane_id_seq_data.prop, by="Lane_ID")
+
+# Define a palette of colours for each genus that might occur in this plot.
+genusPalette <- c( Acinetobacter="#CDCD00",
+                   Actinomyces="#BDB76B",
+                   Anaerococcus="#CDCDC1",
+                   Bacteroides="#FF8C69",
+                   Bifidobacterium="#000080",
+                   Bilophila="#EED5D2",
+                   Candida="#CDC9C9",
+                   Citrobacter="#FFA500",
+                   Clostridium="#848484",
+                   Coprobacter="#FFE4E1",
+                   Coprobacillus="#EED5D2",
+                   Corynebacterium="#FFFAF0",
+                   Dermabacter="#EEEEE0",
+                   Enterococcus="#76EE00",
+                   Escherichia="#FFFF00",
+                   Eggerthella="#E0EEE0",
+                   Enterobacter="#FF7F00",
+                   Finegoldia="#FFDAB9",
+                   Flavonifractor="#F5F5DC",
+                   Gemella="#EECBAD",
+                   Granulicatella="#E3E3E3",
+                   Haemophilus="#00FA9A",
+                   Klebsiella="#FFBBFF",
+                   Lactobacillus="#DB7093",
+                   Parabacteroides="#bc4512",
+                   Peptoniphilus="#9B30FF",
+                   Peptostreptococcaceae="#912CEE",
+                   Prevotella="#2e9f97",
+                   Cutibacterium="#00C5CD",
+                   Proteus="#FAFAD2",
+                   Pseudomonas="#BCD2EE",
+                   Raoultella="#9268a5",
+                   Rothia="#00EEEE",
+                   Serratia="#BDB76B",
+                   Shigella="#D2B48C",
+                   Streptococcus="#DAA520",
+                   Streptococcus="#89661c",
+                   Stenotrophomonas="#627037",
+                   Ureaplasma="#EEE0E5",
+                   Staphylococcus="#FF4040",
+                   Varibaculum="#a5571c",
+                   Veillonella="#F4A460",
+                   Bradyrhizobium="black",
+                   Burkholderia="brown",
+                   Neisseria="#FF00FF",
+                   Ochrobactrum="#848484",
+                   Peptostreptococcus="#282828",
+                   Roseomonas="#B7B7B7", 
+                   Erysipelatoclostridium="green4",
+                   Lactococcus="purple",
+                   Kluyvera="grey"
+)
+
+# Select data
+seqs_subsampled <- dplyr::select(filter(prop_metadata_merged,
+                                        #suspected_NEC == "y",
+                                        Treatment == "Bif/Lacto",
+                                        #Treatment == "Control",
+                                        sample_age %in% c(1,2,3,4)),
+                                 c(#sample_ID_ordered,
+                                   sample_age,
+                                   #Treatment,
+                                   #Acinetobacter,
+                                   #Actinomyces,
+                                   #Bacteroides,
+                                   #Clostridium,
+                                   #Corynebacterium,
+                                   Cutibacterium,
+                                   Escherichia,
+                                   Enterococcus,
+                                   #Enterobacter,                                   
+                                   #Lactococcus,
+                                   Lactobacillus,
+                                   Klebsiella,
+                                   #Parabacteroides,
+                                   #Pseudomonas,
+                                   #Raoultella,
+                                   #Shigella,
+                                   Staphylococcus,
+                                   Streptococcus,
+                                   Bifidobacterium
+                                   #34:ncol(prop_metadata_merged)
+                                 ))
+
+# Make sample_age into a factor (the plotting will not work unless this is a factor)
+seqs_subsampled$sample_age <- as.factor(seqs_subsampled$sample_age)
+
+# Calculate the mean average of each genus at each time point (sample_age).
+aggregated_data <- aggregate(seqs_subsampled[,
+                                             2:ncol(seqs_subsampled)],
+                             list(seqs_subsampled$sample_age),
+                             mean) # Define the type of average calculated: median is an alternative.
+
+# Convert the data from wide to long format.
+aggregated_data_long <- melt(aggregated_data, id.vars = "Group.1", variable.name = "variable")
+
+# Rename the columns in the new long format file.
+aggregated_data_long <- dplyr::rename(aggregated_data_long,
+       Time_point = Group.1,
+       Genus = variable,
+       Proportion = value)
+
+# Set the levels of the genus (this is the reverse order in which they will appear on the plot).
+aggregated_data_long$Genus <- factor(aggregated_data_long$Genus,
+                                     levels = c(#"Enterobacter",
+                                                #"Clostridium",
+                                                "Cutibacterium",
+                                                "Lactobacillus",
+                                                "Streptococcus",
+                                                "Klebsiella",
+                                                "Escherichia",
+                                                "Enterococcus",
+                                                "Staphylococcus",
+                                                "Bifidobacterium"
+                                     ))
+# Make the plot.
+ggplot(aggregated_data_long,
+       aes(x = Time_point,
+           y = Genus)) +
+  geom_point(aes(size = Proportion,
+                 fill = Genus),
+             shape=21) + 
+  scale_size(range = c(0, 10),
+             guide = "legend",
+             limits = c(0, 100),
+             breaks = c(0, 20, 40, 60),
+             labels = c("0", "20", "40", "60")
+  ) +
+  scale_fill_manual(values = genusPalette,
+                    guide = FALSE) +
+  scale_y_discrete(expand = c(0, 1)) +
+  scale_x_discrete(labels=c("<10", "10-29", "30-49", ">50")) +
+  labs(title="Bif/Lacto group",
+       x = "Time point (days from birth)",
+       y="Genus") +
+  theme(plot.title = element_text(size=7),           # Define the plot title font size.
+        legend.position = "right",                   # Define the legend position.
+        legend.title = element_text(size=7),         # Define the legend title font size.
+        legend.text = element_text(size=7),          # Define the size of the legend text
+        legend.background = element_blank(),         # Remove the grey background from the legend.
+        legend.key = element_blank(),                # Remove the box from the legend
+        panel.background = element_blank(),          # Remove the grey plot background
+        panel.border = element_blank(),              # Remove the border from around the plot
+        panel.grid.major = element_blank(),          # Remove the major plot gridlines
+        panel.grid.minor = element_blank(),          # Remove the minor plot gridlines
+        axis.text.x = element_text(angle = 0,        # Define x axis label orientation.
+                                   hjust = .5),      # Define x axis label distanec from axis.
+        axis.title.x = element_text(size=7),         # Define the x axis title text size.
+        axis.title.y = element_text(size=7),         # Define the y axis title text size.
+        axis.text = element_text(size=7),            # Define the axis label text size
+        axis.line = element_line(size = 0.35,        # Define axis line thinkness.
+                                 linetype = "solid", # Define axis line style.
+                                 colour = "black"),  # Define axis line colour.
+        aspect.ratio = 1.1)                          # Define the aspect ratio of the plot.
+
+# Set the file to save the figure into.
+setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/Bubble plots")
+#Save as a pdf with the size defined to go into the Inkspace figure.
+ggsave("BifLacto group bubble plots mean 18.10.2018.pdf", scale = .45, dpi = 300)
+
