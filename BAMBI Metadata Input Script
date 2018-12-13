@@ -1,0 +1,118 @@
+#install.packages("stringi")
+library("stringi")
+#install.packages("Hmisc")
+library("Hmisc")
+
+#Set the file directory in which the imput file is saved.
+setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/Metadata")
+
+#Load the datafile into Rstudio.
+#data1 <- read.csv("data file pathway here", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "", "?")) 
+data <- read.csv("C:/Users/dalby/OneDrive/Documents/BAMBI/Metadata/Infloran study metadata combined 18.09.2018.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "", "?")) 
+
+# Re-naming to make everything easier
+
+data$plate <- NA
+data$plate <- data$Lab.plate.number
+
+data$infant <- NA
+data$infant <- data$BAMBI.Name
+
+data$delivery <- NA
+data$delivery <- data$Delivery.Mode
+
+data$birthweight <- NA
+data$birthweight <- data$Birthweight..g.
+
+data$gestage_wks <- NA
+data$gestage_wks <- data$Gestational.age..weeks.
+
+data$gestage_d <- NA
+data$gestage_d <- data$Gestational.age..days.
+
+data$daysfbirth <- NA
+data$daysfbirth <- data$Time.point..days.from.birth.
+
+data$antibiotics <- NA
+data$antibiotics <- data$Antibiotics.at.this.time.point.or.1.or.2.days.before.this.time.point.
+
+data$length_antibiotics <- NA
+data$length_antibiotics <- data$Length.of.antibiotic.treatment..short..1st.week.only...long...1st.week..
+
+data$days_probiotics <- NA
+data$days_probiotics <- data$How.many.days.the.baby.has.taken.probiotic.until.this.time.point.
+
+data$NICU_stay <- NA
+data$NICU_stay <- data$Length.of.stay.in.NICU..days.
+
+data$infections <- NA
+data$infections <- data$Infections.at.this.time.point.
+
+#data$sample_number <- NA
+#data$sample_number <- data$sample_number
+
+data$only_breastmilk <- NA
+data$only_breastmilk <- data$Only.breast.milk.or.any.formula
+
+data$ever_breastmilk <- NA
+data$ever_breastmilk <- data$Ever.breast.milk.or.formula
+
+data$sample_time <- NA
+data$sample_time <- data$Sample.Time.Point
+
+data$Treatment <- NA
+data$Treatment <- data$Treatment_Group
+
+data$hospital_site <- NA
+data$hospital_site <- data$Hospital_Site
+
+data$hospital <- NA
+data$hospital <- data$Hospital
+
+data$probiotic_duration <- NA
+data$probiotic_duration <- data$How.many.days.the.baby.has.taken.probiotic.until.this.time.point.
+
+
+head(data)
+
+data1 <- data[, c("Lane",
+                "Sample",
+                "plate",
+                "infant",
+                "BAMBI_infant",
+                "sample_time",
+                "sample_age",              
+                "Lane_ID",
+                "sample_ID",
+                "sample_ID_ordered",
+                "sample_date",
+                "sample_order",                
+               #"sample_number",               
+                "Treatment",                
+                "Sex",
+                "delivery",
+                "birthweight",
+                "gestage_wks",
+                "gestage_d",
+                "daysfbirth",
+                "days_probiotics",                
+                "probiotic_duration",                
+                "antibiotics",
+                "antibiotics_recoded",
+                "length_antibiotics",
+                "Diet",
+                "only_breastmilk",
+                "ever_breastmilk",                
+                "total_diet",                
+                "diet_type",                
+                "NICU_stay",
+                "infections",
+                "hospital",
+                "hospital_site",
+                "Metabolomics",
+                "suspected_NEC"
+                )]
+
+setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/Test data")
+
+write.csv(data1, file = "recoded_metadata 01.12.2018.csv")
