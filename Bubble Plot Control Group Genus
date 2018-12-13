@@ -1,5 +1,9 @@
 #install.packages("ggplot2")
 library("ggplot2")
+#install.packages("dplyr")
+library("dplyr")
+#install.packages("reshape")
+library("reshape")
 
 # Bubble plot for Bif/Lacto group samples.
 
