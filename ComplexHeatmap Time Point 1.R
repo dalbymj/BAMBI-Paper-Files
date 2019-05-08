@@ -22,9 +22,9 @@ meta_data <- meta_data[c(2:ncol(meta_data))]
 levels(meta_data$Treatment) <- c("Control", "Bif/Lacto")
 
 # Set the working directory to import the sequence data file.
-setwd("C:/Users/dalby/OneDrive/Documents/BAMBI/All Plate Files")
+setwd("C:/Users/dalby/OneDrive/Documents/BAMBI//Final version of input scripts/Sequencing Plates Genus")
 # Import the normalised sequence data.
-seq_data <- read.csv("mergedplates_transposed_subsampled.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?"))
+seq_data <- read.csv("genus_merged_sequence_data_20000.csv", header=TRUE, sep=",", strip.white = TRUE, na.strings=c("NR", "NA", "?"))
 # Remove the first two colomns from this file.
 seq_data1 <- seq_data[c(3:ncol(seq_data))]
 # Convert the data in the file into proportions based on the calculated row totals.
@@ -45,7 +45,7 @@ seqs_subsampled_all <- dplyr::select(filter(prop_all_metadata_merged,
                                      c(Lane_ID, # Selet the Lane_ID column
                                        Acinetobacter:ncol(prop_all_metadata_merged))) # Select all sequence columns
 
-##Selct the Lane_ID column from the sequence data file into its own data frame
+# Selct the Lane_ID column from the sequence data file into its own data frame
 Lane_ID <- subset(seqs_subsampled_all, select=c(Lane_ID))
 seqs_subsampled_all <- seqs_subsampled_all[c(2:ncol(seqs_subsampled_all))]
 
